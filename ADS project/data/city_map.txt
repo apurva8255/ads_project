@@ -1,0 +1,27 @@
+NODES 10
+0 Shivajinagar 30.0 70.0
+1 Deccan 25.0 60.0
+2 Swargate 35.0 50.0
+3 Katraj 40.0 35.0
+4 Kondhwa 50.0 40.0
+5 Hadapsar 60.0 45.0
+6 Kharadi 70.0 60.0
+7 Koregaon_Park 45.0 65.0
+8 Pimpri 20.0 80.0
+9 Hinjewadi 10.0 75.0
+EDGES 15
+0 1 5.0
+0 7 7.0
+0 8 8.0
+1 2 6.0
+1 7 4.0
+2 3 8.0
+2 7 3.0
+3 4 5.0
+4 5 6.0
+5 6 3.0
+6 7 8.0
+7 0 5.0
+8 9 6.0
+8 0 8.0
+9 1 12.0

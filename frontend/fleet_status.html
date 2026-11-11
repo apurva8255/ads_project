@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CitizenConnect | Fleet Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&amp;family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#11131b",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-secondary": "#003824",
+                    "status-normal": "#10B981",
+                    "surface-bright": "#373942",
+                    "inverse-on-surface": "#2e3039",
+                    "tertiary-fixed": "#ffddb8",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "on-surface": "#e1e2ed",
+                    "background-deep": "#0F172A",
+                    "on-primary-container": "#eeefff",
+                    "on-error": "#690005",
+                    "surface-variant": "#32343d",
+                    "surface-container-highest": "#32343d",
+                    "surface-container-high": "#282a32",
+                    "outline-variant": "#434655",
+                    "secondary-container": "#00a572",
+                    "user-calm-blue": "#F0F9FF",
+                    "on-secondary-container": "#00311f",
+                    "on-tertiary-container": "#ffeedd",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "on-tertiary-fixed": "#2a1700",
+                    "primary": "#b4c5ff",
+                    "secondary-fixed": "#6ffbbe",
+                    "secondary": "#4edea3",
+                    "tertiary-container": "#996100",
+                    "tertiary": "#ffb95f",
+                    "on-tertiary": "#472a00",
+                    "surface-container": "#1d1f27",
+                    "on-primary": "#002a78",
+                    "error-container": "#93000a",
+                    "surface-container-lowest": "#0c0e16",
+                    "surface-tint": "#b4c5ff",
+                    "surface-glass": "rgba(30, 41, 59, 0.7)",
+                    "primary-fixed": "#dbe1ff",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "on-surface-variant": "#c3c6d7",
+                    "status-critical": "#EF4444",
+                    "on-background": "#e1e2ed",
+                    "error": "#ffb4ab",
+                    "on-error-container": "#ffdad6",
+                    "inverse-primary": "#0053db",
+                    "secondary-fixed-dim": "#4edea3",
+                    "inverse-surface": "#e1e2ed",
+                    "on-primary-fixed": "#00174b",
+                    "on-secondary-fixed-variant": "#005236",
+                    "outline": "#8d90a0",
+                    "operator-success": "#22C55E",
+                    "on-secondary-fixed": "#002113",
+                    "primary-container": "#2563eb",
+                    "surface-container-low": "#191b23",
+                    "surface": "#11131b",
+                    "surface-dim": "#11131b",
+                    "status-high": "#F97316"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-lg": "48px",
+                    "unit": "8px",
+                    "margin-sm": "16px",
+                    "margin-md": "32px",
+                    "container-max": "1440px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Outfit"],
+                    "headline-lg": ["Outfit"],
+                    "operator-nav": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "headline-lg-mobile": ["Outfit"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "operator-nav": ["28px", {"lineHeight": "1.1", "fontWeight": "800"}],
+                    "label-caps": ["12px", {"letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #434655; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen selection:bg-primary selection:text-on-primary">
+<header class="fixed top-0 left-0 right-0 z-50 bg-surface dark:bg-surface-dim shadow-[0_10px_30px_rgba(0,0,0,0.05)] h-16">
+<div class="flex justify-between items-center w-full px-margin-sm max-w-[1440px] mx-auto h-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed text-[32px]">emergency</span>
+<a href="index.html" class="font-headline-lg text-headline-lg-mobile text-primary dark:text-primary-fixed tracking-tight">CitizenConnect</a>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant dark:text-outline font-label-caps text-label-caps hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors px-3 py-2 rounded-lg" href="admin_dashboard.html">DASHBOARD</a>
+<a class="text-primary dark:text-primary-fixed font-bold font-label-caps text-label-caps px-3 py-2 border-b-2 border-primary" href="fleet_status.html">FLEET STATUS</a>
+<a class="text-on-surface-variant dark:text-outline font-label-caps text-label-caps hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors px-3 py-2 rounded-lg" href="facility_directory.html">FACILITIES</a>
+</nav>
+<div class="flex items-center gap-4">
+<a href="index.html" onclick="sessionStorage.removeItem('adminAuth')" class="flex items-center gap-2 text-outline hover:text-error transition-colors font-label-caps text-label-caps px-3 py-2">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+                    LOGOUT
+                </a>
+<div class="h-8 w-8 rounded-full bg-primary-container flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-on-primary-container text-lg">person</span>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-20 px-margin-sm md:px-margin-lg max-w-[1440px] mx-auto">
+<div class="grid grid-cols-12 gap-gutter">
+<section class="col-span-12 flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Fleet Command Center</h2>
+<p class="text-on-surface-variant font-body-md">Real-time oversight of all metropolitan emergency response assets.</p>
+</div>
+<div class="flex flex-wrap gap-3">
+<div class="glass-panel px-4 py-3 rounded-xl flex flex-col min-w-[120px]">
+<span class="text-label-caps font-label-caps text-outline">TOTAL ACTIVE</span>
+<span id="stat-total" class="text-headline-md font-headline-md text-primary">—</span>
+</div>
+<div class="glass-panel px-4 py-3 rounded-xl flex flex-col min-w-[120px]">
+<span class="text-label-caps font-label-caps text-outline">AVAILABLE</span>
+<span id="stat-available" class="text-headline-md font-headline-md text-status-normal">—</span>
+</div>
+<div class="glass-panel px-4 py-3 rounded-xl flex flex-col min-w-[120px]">
+<span class="text-label-caps font-label-caps text-outline">BUSY</span>
+<span id="stat-busy" class="text-headline-md font-headline-md text-status-high">—</span>
+</div>
+</div>
+</section>
+<section class="col-span-12 lg:col-span-4 xl:col-span-3 space-y-gutter">
+<div class="glass-panel p-gutter rounded-xl">
+<h3 class="font-label-caps text-label-caps text-on-surface mb-4">SEARCH &amp; FILTER</h3>
+<div class="space-y-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input id="search-input" oninput="applyFilters()" class="w-full bg-surface-container-high border-none rounded-lg pl-10 text-body-md focus:ring-2 focus:ring-primary text-on-surface" placeholder="Search by name..." type="text"/>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-outline mb-2 block">VEHICLE TYPE</label>
+<div id="type-filters" class="grid grid-cols-1 gap-2">
+<button onclick="setTypeFilter(-1)" data-type="-1" class="filter-type-btn flex items-center gap-3 px-3 py-2 rounded-lg bg-primary-container text-on-primary-container transition-colors">
+<span class="material-symbols-outlined">all_inclusive</span>
+<span class="font-body-md">All Vehicles</span>
+</button>
+<button onclick="setTypeFilter(0)" data-type="0" class="filter-type-btn flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined">medical_services</span>
+<span class="font-body-md">Ambulance</span>
+</button>
+<button onclick="setTypeFilter(1)" data-type="1" class="filter-type-btn flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined">local_police</span>
+<span class="font-body-md">Police</span>
+</button>
+<button onclick="setTypeFilter(2)" data-type="2" class="filter-type-btn flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined">fire_truck</span>
+<span class="font-body-md">Fire Truck</span>
+</button>
+</div>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-outline mb-2 block">STATUS</label>
+<select id="status-filter" onchange="applyFilters()" class="w-full bg-surface-container-high border-none rounded-lg text-body-md focus:ring-2 focus:ring-primary text-on-surface">
+<option value="-1">All Statuses</option>
+<option value="0">Available</option>
+<option value="1">Busy</option>
+</select>
+</div>
+</div>
+</div>
+<div class="glass-panel overflow-hidden rounded-xl h-64 relative">
+<div class="absolute inset-0 bg-cover bg-center opacity-40" data-alt="A dark-themed stylized map of a metropolitan city with neon glowing blue and orange data points representing vehicle locations. The map uses a sophisticated night-mode palette of deep blacks and dark navies, with thin, precise glowing lines for streets and pulsing icons for emergency assets." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAd7NZrHn6AmeZrIKgPqVykB364JDDQeyPMolecCwTPxuCw0WDT3fMO-lrD6A4U-3HF0kC8INoXTxXJeJl9c5ymAvCce4G4kxjaqHSYtzhmlYObP0qiAXQdUx0BfxqYSUznGJnOpYY6gkIvqPYTgw8f5K3jpC5jhskCMVAqt5XRbUzqlikLrKvX8sp-sJuFuAe-VeXhmQtPtYwk9-ms_vpdLeM3kgkkniNye_FVJv-Y7IpxUNnZU0rnuDNiqGdOSrWa_Es3TNLiL7c')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+<div class="relative z-10 p-4 flex flex-col justify-end h-full">
+<h4 class="font-label-caps text-label-caps text-on-surface">LIVE DEPLOYMENT</h4>
+<p class="text-[10px] text-outline">CENTRAL DISTRICT FOCUS</p>
+</div>
+</div>
+</section>
+<section class="col-span-12 lg:col-span-8 xl:col-span-9">
+<div class="glass-panel rounded-xl overflow-hidden flex flex-col">
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high border-b border-outline-variant">
+<th class="px-6 py-4 font-label-caps text-label-caps text-outline">UNIT ID</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-outline">TYPE</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-outline">LOCATION (NODE)</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-outline">STATUS</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-outline text-right">LAST UPDATED</th>
+</tr>
+</thead>
+<tbody id="vehicle-table-body" class="divide-y divide-outline-variant/30">
+<tr><td colspan="5" class="px-6 py-12 text-center text-outline">Loading vehicles from AVL Tree...</td></tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 flex items-center justify-between bg-surface-container-low border-t border-outline-variant">
+<span id="pagination-info" class="text-label-caps text-outline uppercase">Loading...</span>
+<div class="flex gap-2">
+<button onclick="prevPage()" class="p-2 rounded-lg hover:bg-surface-container-highest text-outline transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button onclick="nextPage()" class="p-2 rounded-lg hover:bg-surface-container-highest text-outline transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<footer class="w-full py-8 px-margin-sm flex flex-col items-center gap-4 text-center max-w-[600px] mx-auto mb-20 bg-surface-container-lowest dark:bg-surface-dim mt-8">
+<h3 class="font-headline-md text-headline-md text-on-surface">Emergency Response System</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">© 2024 Emergency Response System. All rights reserved.</p>
+
+</footer>
+<nav class="fixed bottom-0 left-0 right-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface dark:bg-surface-dim max-w-[600px] mx-auto md:hidden rounded-t-xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-6 py-1 hover:bg-surface-container-low dark:hover:bg-surface-container-highest">
+<span class="material-symbols-outlined">campaign</span>
+<span class="font-label-caps text-label-caps">Report</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-6 py-1 scale-90 duration-200 transition-transform">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-caps text-label-caps">Active</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-6 py-1 hover:bg-surface-container-low dark:hover:bg-surface-container-highest">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-caps text-label-caps">Help</span>
+</button>
+</nav>
+
+<script>
+// ─── Fleet Status: Live API Integration with Filters ────────────────
+let allVehicles = [];
+let currentTypeFilter = -1; // -1 = all
+let currentPage = 0;
+const PAGE_SIZE = 20;
+
+const TYPE_META = {
+    0: { label: 'Ambulance', icon: 'medical_services', color: 'primary', prefix: 'AMB' },
+    1: { label: 'Police', icon: 'local_police', color: 'secondary', prefix: 'POL' },
+    2: { label: 'Fire Truck', icon: 'fire_truck', color: 'error', prefix: 'FIRE' },
+};
+const STATUS_META = {
+    0: { label: 'Available', color: 'status-normal', pulse: true },
+    1: { label: 'Busy', color: 'status-critical', pulse: false },
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (!sessionStorage.getItem('adminAuth')) {
+        window.location.href = 'admin_login.html';
+        return;
+    }
+    loadFleetData();
+    setInterval(loadFleetData, 3000);
+});
+
+async function loadFleetData() {
+    try {
+        const res = await fetch('/api/vehicles');
+        const data = await res.json();
+        allVehicles = data.items;
+        updateStats();
+        applyFilters();
+    } catch (e) {
+        document.getElementById('vehicle-table-body').innerHTML =
+            '<tr><td colspan="5" class="px-6 py-12 text-center text-error">API unavailable</td></tr>';
+    }
+}
+
+function updateStats() {
+    const total = allVehicles.length;
+    const available = allVehicles.filter(v => v.statusCode === 0).length;
+    const busy = allVehicles.filter(v => v.statusCode === 1).length;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-available').textContent = available;
+    document.getElementById('stat-busy').textContent = busy;
+}
+
+function setTypeFilter(type) {
+    currentTypeFilter = type;
+    currentPage = 0;
+    // Update button styles
+    document.querySelectorAll('.filter-type-btn').forEach(btn => {
+        const isActive = parseInt(btn.dataset.type) === type;
+        btn.className = 'filter-type-btn flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ' +
+            (isActive ? 'bg-primary-container text-on-primary-container' : 'hover:bg-surface-container-highest');
+    });
+    applyFilters();
+}
+
+function applyFilters() {
+    const search = (document.getElementById('search-input').value || '').toLowerCase();
+    const statusVal = parseInt(document.getElementById('status-filter').value);
+
+    let filtered = allVehicles;
+
+    // Filter by type
+    if (currentTypeFilter >= 0) {
+        filtered = filtered.filter(v => v.typeCode === currentTypeFilter);
+    }
+    // Filter by status
+    if (statusVal >= 0) {
+        filtered = filtered.filter(v => v.statusCode === statusVal);
+    }
+    // Search by name
+    if (search.length > 0) {
+        filtered = filtered.filter(v => v.name.toLowerCase().includes(search));
+    }
+
+    renderTable(filtered);
+}
+
+function renderTable(vehicles) {
+    const tbody = document.getElementById('vehicle-table-body');
+    const start = currentPage * PAGE_SIZE;
+    const page = vehicles.slice(start, start + PAGE_SIZE);
+
+    if (page.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-12 text-center text-outline">No vehicles match the current filters.</td></tr>';
+        document.getElementById('pagination-info').textContent = '0 results';
+        return;
+    }
+
+    tbody.innerHTML = page.map(v => {
+        const t = TYPE_META[v.typeCode] || TYPE_META[0];
+        const s = STATUS_META[v.statusCode] || STATUS_META[0];
+        return `
+        <tr class="hover:bg-surface-container-highest/50 transition-colors">
+            <td class="px-6 py-4 font-body-md text-on-surface font-bold">${t.prefix}-${String(v.id).padStart(3,'0')}</td>
+            <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-${t.color} text-[20px]">${t.icon}</span>
+                    <span class="text-body-md">${t.label}</span>
+                </div>
+            </td>
+            <td class="px-6 py-4">
+                <div class="flex flex-col">
+                    <span class="font-mono text-[14px] text-on-surface-variant">Node ${v.locationNodeID}</span>
+                    <span class="text-[10px] text-outline">${v.name.replace(/_/g,' ')}</span>
+                </div>
+            </td>
+            <td class="px-6 py-4">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-${s.color}/10 text-${s.color} text-[12px] font-bold uppercase">
+                    <span class="w-1.5 h-1.5 rounded-full bg-${s.color} ${s.pulse ? 'animate-pulse' : ''}"></span>
+                    ${s.label}
+                </span>
+            </td>
+            <td class="px-6 py-4 text-right text-body-md text-outline">(${v.posX.toFixed(1)}, ${v.posY.toFixed(1)})</td>
+        </tr>`;
+    }).join('');
+
+    const totalPages = Math.ceil(vehicles.length / PAGE_SIZE);
+    document.getElementById('pagination-info').textContent =
+        `Showing ${start+1}–${Math.min(start+PAGE_SIZE, vehicles.length)} of ${vehicles.length} vehicles (Page ${currentPage+1}/${totalPages})`;
+}
+
+function prevPage() {
+    if (currentPage > 0) { currentPage--; applyFilters(); }
+}
+function nextPage() {
+    const statusVal = parseInt(document.getElementById('status-filter').value);
+    let filtered = allVehicles;
+    if (currentTypeFilter >= 0) filtered = filtered.filter(v => v.typeCode === currentTypeFilter);
+    if (statusVal >= 0) filtered = filtered.filter(v => v.statusCode === statusVal);
+    const search = (document.getElementById('search-input').value || '').toLowerCase();
+    if (search.length > 0) filtered = filtered.filter(v => v.name.toLowerCase().includes(search));
+    if ((currentPage + 1) * PAGE_SIZE < filtered.length) { currentPage++; applyFilters(); }
+}
+</script>
+</body></html>

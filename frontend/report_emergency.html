@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CitizenConnect | Report Emergency</title>
+<meta name="description" content="Report an emergency and get immediate help from Pune's dispatch network."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    .shimmer { background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%); background-size: 200% 100%; animation: shimmer 2s infinite; }
+    .type-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .type-card.selected { transform: scale(1.02); }
+    .autocomplete-dropdown { max-height: 240px; overflow-y: auto; }
+    .autocomplete-dropdown::-webkit-scrollbar { width: 4px; }
+    .autocomplete-dropdown::-webkit-scrollbar-thumb { background: rgba(180, 197, 255, 0.3); border-radius: 10px; }
+</style>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: { extend: {
+        colors: {
+          "primary": "#b4c5ff", "primary-container": "#2563eb", "on-primary": "#002a78",
+          "on-primary-container": "#eeefff", "secondary": "#4edea3", "on-secondary": "#003824",
+          "secondary-container": "#00a572", "tertiary": "#ffb95f", "on-tertiary": "#472a00",
+          "tertiary-container": "#996100", "error": "#ffb4ab", "on-error": "#690005",
+          "error-container": "#93000a", "on-error-container": "#ffdad6",
+          "background": "#11131b", "on-background": "#e1e2ed", "surface": "#11131b",
+          "surface-dim": "#11131b", "surface-container-lowest": "#0c0e16",
+          "surface-container-low": "#191b23", "surface-container": "#1d1f27",
+          "surface-container-high": "#282a32", "surface-container-highest": "#32343d",
+          "on-surface": "#e1e2ed", "on-surface-variant": "#c3c6d7",
+          "outline": "#8d90a0", "outline-variant": "#434655",
+          "status-critical": "#EF4444", "status-high": "#F97316", "status-normal": "#10B981",
+          "background-deep": "#0F172A", "surface-glass": "rgba(30, 41, 59, 0.7)",
+        },
+        fontFamily: { "headline": ["Outfit"], "body": ["Inter"], "label": ["Inter"] },
+      }},
+    }
+</script>
+</head>
+<body class="bg-background text-on-surface font-body min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="border-b border-outline-variant/30 bg-surface/80 backdrop-blur-xl sticky top-0 z-50">
+    <div class="max-w-[1440px] mx-auto px-8 h-16 flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-2xl">emergency</span>
+            <h1 class="font-headline text-xl font-bold text-primary tracking-tight">CitizenConnect</h1>
+        </a>
+        <nav class="flex items-center gap-6">
+            <a href="index.html" class="text-on-surface-variant hover:text-primary transition-colors text-xs font-bold uppercase tracking-wider">Home</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="flex-1">
+    <div class="max-w-[1440px] mx-auto px-8 py-12">
+        <div class="grid grid-cols-12 gap-10">
+            <!-- Left Column: Form -->
+            <div class="col-span-12 lg:col-span-7">
+                <div class="mb-8">
+                    <h2 class="font-headline text-4xl font-bold text-on-surface mb-2">Report an Emergency</h2>
+                    <p class="text-on-surface-variant text-lg">Help is just a few clicks away. Select the type of emergency and provide your location.</p>
+                </div>
+
+                <!-- Step 1: Emergency Type -->
+                <div class="mb-8">
+                    <label class="text-xs font-bold text-outline uppercase tracking-wider mb-4 block">Step 1 — Select Emergency Type</label>
+                    <div class="grid grid-cols-3 gap-4">
+                        <button id="type-medical" onclick="selectType('medical')" class="type-card glass-panel rounded-2xl p-6 flex flex-col items-center gap-3 hover:border-secondary/50 cursor-pointer group">
+                            <div class="w-14 h-14 rounded-xl bg-secondary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-secondary text-3xl">medical_services</span>
+                            </div>
+                            <span class="font-bold text-sm">Medical</span>
+                            <span class="text-[10px] text-outline text-center">Ambulance, Injury, Health Crisis</span>
+                        </button>
+                        <button id="type-crime" onclick="selectType('crime')" class="type-card glass-panel rounded-2xl p-6 flex flex-col items-center gap-3 hover:border-status-high/50 cursor-pointer group">
+                            <div class="w-14 h-14 rounded-xl bg-status-high/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-status-high text-3xl">local_police</span>
+                            </div>
+                            <span class="font-bold text-sm">Crime</span>
+                            <span class="text-[10px] text-outline text-center">Police assistance</span>
+                        </button>
+                        <button id="type-fire" onclick="selectType('fire')" class="type-card glass-panel rounded-2xl p-6 flex flex-col items-center gap-3 hover:border-status-critical/50 cursor-pointer group">
+                            <div class="w-14 h-14 rounded-xl bg-status-critical/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-status-critical text-3xl">local_fire_department</span>
+                            </div>
+                            <span class="font-bold text-sm">Fire</span>
+                            <span class="text-[10px] text-outline text-center">Fire or Gas leak</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Location -->
+                <div class="mb-8">
+                    <label class="text-xs font-bold text-outline uppercase tracking-wider mb-4 block">Step 2 — Enter Location</label>
+                    <div class="relative">
+                        <div class="glass-panel rounded-xl flex items-center px-4 gap-3">
+                            <span class="material-symbols-outlined text-primary">search</span>
+                            <input id="location-input" type="text" placeholder="Start typing a location (e.g., Karve, Galaxy, FC)..." 
+                                   class="bg-transparent w-full py-4 text-on-surface placeholder-outline focus:outline-none text-base"
+                                   oninput="handleAutocomplete(this.value)" autocomplete="off"/>
+                            <span id="location-clear" class="material-symbols-outlined text-outline cursor-pointer hover:text-error transition-colors hidden" onclick="clearLocation()">close</span>
+                        </div>
+                        <!-- Autocomplete Dropdown -->
+                        <div id="autocomplete-list" class="autocomplete-dropdown absolute top-full left-0 right-0 mt-2 bg-surface-container border border-outline-variant rounded-xl overflow-hidden z-50 hidden shadow-2xl">
+                        </div>
+                    </div>
+                    <p id="selected-location" class="text-xs text-secondary mt-2 hidden">
+                        <span class="material-symbols-outlined text-sm align-middle">check_circle</span>
+                        Location selected: <span id="location-name" class="font-bold"></span>
+                    </p>
+                </div>
+
+                <!-- Step 3: Priority -->
+                <div class="mb-8">
+                    <label class="text-xs font-bold text-outline uppercase tracking-wider mb-4 block">Step 3 — Set Priority Level</label>
+                    <div class="grid grid-cols-3 gap-4">
+                        <button id="pri-1" onclick="selectPriority(1)" class="type-card glass-panel rounded-xl p-4 flex items-center gap-3 hover:border-status-critical/50 cursor-pointer">
+                            <div class="w-3 h-3 rounded-full bg-status-critical animate-pulse"></div>
+                            <div>
+                                <span class="font-bold text-sm block">Critical</span>
+                                <span class="text-[10px] text-outline">Life-threatening</span>
+                            </div>
+                        </button>
+                        <button id="pri-2" onclick="selectPriority(2)" class="type-card glass-panel rounded-xl p-4 flex items-center gap-3 hover:border-status-high/50 cursor-pointer">
+                            <div class="w-3 h-3 rounded-full bg-status-high"></div>
+                            <div>
+                                <span class="font-bold text-sm block">High</span>
+                                <span class="text-[10px] text-outline">Urgent response</span>
+                            </div>
+                        </button>
+                        <button id="pri-3" onclick="selectPriority(3)" class="type-card glass-panel rounded-xl p-4 flex items-center gap-3 hover:border-status-normal/50 cursor-pointer">
+                            <div class="w-3 h-3 rounded-full bg-status-normal"></div>
+                            <div>
+                                <span class="font-bold text-sm block">Normal</span>
+                                <span class="text-[10px] text-outline">Non-critical</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Additional Details -->
+                <div class="mb-8">
+                    <label class="text-xs font-bold text-outline uppercase tracking-wider mb-4 block">Step 4 — Additional Details (Optional)</label>
+                    <div class="glass-panel rounded-xl p-1">
+                        <textarea id="details-input" rows="3" placeholder="Describe the situation briefly..."
+                                  class="bg-transparent w-full p-4 text-on-surface placeholder-outline focus:outline-none text-sm resize-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="flex items-center gap-4">
+                    <button id="submit-btn" onclick="submitEmergency()" disabled
+                            class="bg-primary-container text-on-primary-container px-10 py-4 rounded-2xl font-bold text-lg flex items-center gap-3 transition-all hover:brightness-110 active:scale-95 shadow-lg shadow-primary-container/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100">
+                        <span class="material-symbols-outlined text-2xl">send</span>
+                        Submit Emergency Report
+                    </button>
+                    <p class="text-xs text-outline max-w-xs">By submitting, you confirm this is a real-time emergency requiring immediate response.</p>
+                </div>
+            </div>
+
+            <!-- Right Column: Live Info -->
+            <div class="col-span-12 lg:col-span-5 flex flex-col gap-6">
+                <!-- Data Structures Info Card -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="font-headline text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-tertiary">hub</span>
+                        Powered by Advanced Algorithms
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 p-3 bg-surface-container rounded-xl">
+                            <div class="w-8 h-8 rounded-lg bg-primary-container/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary text-sm">search</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-xs">Trie — Location Autocomplete</p>
+                                <p class="text-[10px] text-outline">O(K) prefix search, K = prefix length</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-surface-container rounded-xl">
+                            <div class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-secondary text-sm">sort</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-xs">Priority Queue — Sorted Emergency Calls</p>
+                                <p class="text-[10px] text-outline">O(N) insert, O(1) dequeue highest priority</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-surface-container rounded-xl">
+                            <div class="w-8 h-8 rounded-lg bg-tertiary/10 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-tertiary text-sm">near_me</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-xs">QuadTree — Nearest Vehicle Search</p>
+                                <p class="text-[10px] text-outline">O(log N) spatial nearest-neighbor query</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-surface-container rounded-xl">
+                            <div class="w-8 h-8 rounded-lg bg-status-critical/10 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-status-critical text-sm">route</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-xs">Dijkstra + Fibonacci Heap — Fastest Route</p>
+                                <p class="text-[10px] text-outline">O(E + V log V) traffic-weighted shortest path</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Queue Preview -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="font-headline text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-status-critical">format_list_bulleted</span>
+                        Current Emergency Queue
+                    </h3>
+                    <div id="queue-container" class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-surface-container rounded-xl border-l-4 border-status-critical">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-status-critical text-sm">medical_services</span>
+                                <div>
+                                    <p class="font-bold text-xs">Medical — Karve Road</p>
+                                    <p class="text-[10px] text-outline">Submitted 2 min ago</p>
+                                </div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-status-critical text-white uppercase">Critical</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-surface-container rounded-xl border-l-4 border-status-high">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-status-high text-sm">local_fire_department</span>
+                                <div>
+                                    <p class="font-bold text-xs">Fire — Aundh District</p>
+                                    <p class="text-[10px] text-outline">Submitted 5 min ago</p>
+                                </div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-status-high text-white uppercase">High</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-surface-container rounded-xl border-l-4 border-status-normal">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-status-normal text-sm">local_police</span>
+                                <div>
+                                    <p class="font-bold text-xs">Crime — FC Road</p>
+                                    <p class="text-[10px] text-outline">Submitted 12 min ago</p>
+                                </div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-status-normal text-white uppercase">Normal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coverage Map Placeholder -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="font-headline text-lg font-bold mb-3 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">map</span>
+                        Coverage Area
+                    </h3>
+                    <div class="bg-surface-container-high rounded-xl h-48 flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-30" style="background: radial-gradient(circle at 50% 50%, #2563eb 0%, transparent 60%)"></div>
+                        <div class="text-center z-10">
+                            <p class="font-headline text-xl font-bold text-primary">Pune, India</p>
+                            <p class="text-xs text-outline">3 km radius • 3,000 intersections • 6,632 roads</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Success Modal (hidden by default) -->
+<div id="success-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center">
+    <div class="glass-panel rounded-3xl p-10 max-w-md w-full text-center flex flex-col items-center gap-6 mx-4">
+        <div class="w-20 h-20 rounded-full bg-secondary/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-secondary text-5xl">check_circle</span>
+        </div>
+        <h3 class="font-headline text-2xl font-bold text-on-surface">Emergency Reported!</h3>
+        <p class="text-on-surface-variant text-sm">Your emergency has been queued and dispatchers have been notified. Help is on the way.</p>
+        <div class="bg-surface-container rounded-xl p-4 w-full text-left">
+            <div class="flex justify-between mb-2">
+                <span class="text-xs text-outline">Reference #</span>
+                <span class="text-xs font-bold text-primary" id="ref-number">#7291-PUNE</span>
+            </div>
+            <div class="flex justify-between mb-2">
+                <span class="text-xs text-outline">Status</span>
+                <span class="text-xs font-bold text-secondary">QUEUED</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-xs text-outline">Est. Response</span>
+                <span class="text-xs font-bold text-tertiary">~4 minutes</span>
+            </div>
+        </div>
+        <div class="flex gap-3 w-full">
+            <button onclick="closeModal()" class="flex-1 bg-primary text-on-primary py-3 rounded-xl font-bold text-sm text-center hover:brightness-110 transition-all shadow-lg shadow-primary/20">Close & Return</button>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="border-t border-outline-variant/30 bg-surface-container-lowest/50">
+    <div class="max-w-[1440px] mx-auto px-8 py-6 flex justify-between items-center">
+        <span class="text-outline text-xs">© 2026 Emergency Response System</span>
+        
+    </div>
+</footer>
+
+<script>
+// ─── State ──────────────────────────────────────────────────────────
+let selectedType = null;
+let selectedPriority = null;
+let selectedLocation = null;
+let autocompleteDebounce = null;
+
+const TYPE_MAP = { medical: 0, crime: 1, fire: 2 };
+const TYPE_ICONS = { Medical: 'medical_services', Crime: 'local_police', Fire: 'local_fire_department' };
+const PRIORITY_COLORS = { 1: 'status-critical', 2: 'status-high', 3: 'status-normal' };
+const PRIORITY_LABELS = { 1: 'Critical', 2: 'High', 3: 'Normal' };
+
+// Read URL params for pre-selected type
+const params = new URLSearchParams(window.location.search);
+if (params.get('type')) {
+    setTimeout(() => selectType(params.get('type')), 100);
+}
+
+// Load live queue on page load
+document.addEventListener('DOMContentLoaded', loadQueue);
+
+function selectType(type) {
+    selectedType = type;
+    document.querySelectorAll('[id^="type-"]').forEach(el => {
+        el.classList.remove('selected', 'border-secondary', 'border-status-high', 'border-status-critical', 'shadow-lg');
+    });
+    const el = document.getElementById('type-' + type);
+    const colors = { medical: 'border-secondary shadow-secondary/20', crime: 'border-status-high shadow-status-high/20', fire: 'border-status-critical shadow-status-critical/20' };
+    el.classList.add('selected', 'shadow-lg', ...colors[type].split(' '));
+    validateForm();
+}
+
+function selectPriority(pri) {
+    selectedPriority = pri;
+    document.querySelectorAll('[id^="pri-"]').forEach(el => {
+        el.classList.remove('selected', 'border-status-critical', 'border-status-high', 'border-status-normal', 'shadow-lg');
+    });
+    const el = document.getElementById('pri-' + pri);
+    const colors = { 1: 'border-status-critical shadow-status-critical/20', 2: 'border-status-high shadow-status-high/20', 3: 'border-status-normal shadow-status-normal/20' };
+    el.classList.add('selected', 'shadow-lg', ...colors[pri].split(' '));
+    validateForm();
+}
+
+// ─── LIVE Trie Autocomplete via /api/search ─────────────────────────
+function handleAutocomplete(value) {
+    const list = document.getElementById('autocomplete-list');
+    const clearBtn = document.getElementById('location-clear');
+    if (value.length < 1) {
+        list.classList.add('hidden');
+        clearBtn.classList.add('hidden');
+        return;
+    }
+    clearBtn.classList.remove('hidden');
+
+    // Debounce API calls (200ms)
+    clearTimeout(autocompleteDebounce);
+    autocompleteDebounce = setTimeout(async () => {
+        try {
+            const res = await fetch(`/api/search?prefix=${encodeURIComponent(value)}&limit=10`);
+            const matches = await res.json();
+            if (matches.length === 0) {
+                list.classList.add('hidden');
+                return;
+            }
+            list.innerHTML = matches.map(m => `
+                <button class="w-full px-4 py-3 text-left hover:bg-surface-container-high transition-colors flex items-center gap-3 border-b border-outline-variant/30 last:border-0"
+                        onclick="pickLocation('${m.name}', ${m.nodeID})">
+                    <span class="material-symbols-outlined text-primary text-sm">location_on</span>
+                    <div>
+                        <span class="font-bold text-sm">${m.name.replace(/_/g, ' ')}</span>
+                        <span class="text-[10px] text-outline ml-2">Node ${m.nodeID}</span>
+                    </div>
+                </button>
+            `).join('');
+            list.classList.remove('hidden');
+        } catch (e) {
+            console.error('Autocomplete error:', e);
+            list.classList.add('hidden');
+        }
+    }, 200);
+}
+
+function pickLocation(name, nodeID) {
+    selectedLocation = { name, nodeID };
+    document.getElementById('location-input').value = name.replace(/_/g, ' ');
+    document.getElementById('autocomplete-list').classList.add('hidden');
+    document.getElementById('selected-location').classList.remove('hidden');
+    document.getElementById('location-name').textContent = name.replace(/_/g, ' ') + ' (Node ' + nodeID + ')';
+    validateForm();
+}
+
+function clearLocation() {
+    selectedLocation = null;
+    document.getElementById('location-input').value = '';
+    document.getElementById('autocomplete-list').classList.add('hidden');
+    document.getElementById('location-clear').classList.add('hidden');
+    document.getElementById('selected-location').classList.add('hidden');
+    validateForm();
+}
+
+function validateForm() {
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = !(selectedType && selectedPriority && selectedLocation);
+}
+
+// ─── LIVE Emergency Submission via POST /api/emergency ──────────────
+async function submitEmergency() {
+    if (!selectedType || !selectedPriority || !selectedLocation) return;
+    
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined text-2xl animate-spin">progress_activity</span> Submitting...';
+
+    try {
+        const res = await fetch('/api/emergency', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: TYPE_MAP[selectedType],
+                locationName: selectedLocation.name,
+                priority: selectedPriority,
+            }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.detail || 'Failed');
+
+        document.getElementById('ref-number').textContent = '#CALL-' + String(data.callID).padStart(3, '0');
+        document.getElementById('success-modal').classList.remove('hidden');
+
+        // Refresh the queue sidebar
+        loadQueue();
+    } catch (e) {
+        alert('Error: ' + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-2xl">send</span> Submit Emergency Report';
+        validateForm();
+    }
+}
+
+// ─── LIVE Queue Display via GET /api/queue ───────────────────────────
+async function loadQueue() {
+    const container = document.getElementById('queue-container');
+    if (!container) return;
+    try {
+        const res = await fetch('/api/queue');
+        const data = await res.json();
+        if (data.count === 0) {
+            container.innerHTML = '<p class="text-xs text-outline text-center py-4">No emergencies in queue. System is clear.</p>';
+            return;
+        }
+        container.innerHTML = data.items.slice(0, 5).map(item => {
+            const color = PRIORITY_COLORS[item.priority] || 'outline';
+            const icon = TYPE_ICONS[item.type] || 'emergency';
+            const label = PRIORITY_LABELS[item.priority] || 'Unknown';
+            return `
+            <div class="flex items-center justify-between p-3 bg-surface-container rounded-xl border-l-4 border-${color}">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-${color} text-sm">${icon}</span>
+                    <div>
+                        <p class="font-bold text-xs">${item.type} — ${item.locationName.replace(/_/g, ' ')}</p>
+                        <p class="text-[10px] text-outline">Call #${item.callID}</p>
+                    </div>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-${color} text-white uppercase">${label}</span>
+            </div>`;
+        }).join('');
+    } catch (e) {
+        container.innerHTML = '<p class="text-xs text-outline text-center py-4">API unavailable — showing static data</p>';
+    }
+}
+
+function closeModal() {
+    document.getElementById('success-modal').classList.add('hidden');
+}
+</script>
+
+</body>
+</html>

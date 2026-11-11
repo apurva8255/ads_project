@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CitizenConnect | Operator Console</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    @keyframes pulse-border { 0%, 100% { border-color: rgba(78, 222, 163, 0.3); } 50% { border-color: rgba(78, 222, 163, 0.8); } }
+    .pulse-border { animation: pulse-border 2s ease-in-out infinite; }
+</style>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: { extend: {
+        colors: {
+          "primary": "#b4c5ff", "primary-container": "#2563eb", "on-primary": "#002a78",
+          "on-primary-container": "#eeefff", "secondary": "#4edea3", "on-secondary": "#003824",
+          "secondary-container": "#00a572", "tertiary": "#ffb95f", "on-tertiary": "#472a00",
+          "error": "#ffb4ab", "error-container": "#93000a",
+          "background": "#11131b", "surface": "#11131b", "surface-container-lowest": "#0c0e16",
+          "surface-container-low": "#191b23", "surface-container": "#1d1f27",
+          "surface-container-high": "#282a32", "surface-container-highest": "#32343d",
+          "on-surface": "#e1e2ed", "on-surface-variant": "#c3c6d7",
+          "outline": "#8d90a0", "outline-variant": "#434655",
+          "status-critical": "#EF4444", "status-high": "#F97316", "status-normal": "#10B981",
+          "operator-success": "#22C55E",
+        },
+        fontFamily: { "headline": ["Outfit"], "body": ["Inter"] },
+      }},
+    }
+</script>
+</head>
+<body class="bg-background text-on-surface font-body min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="border-b border-outline-variant/30 bg-surface/80 backdrop-blur-xl sticky top-0 z-50">
+    <div class="max-w-[1440px] mx-auto px-8 h-16 flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-secondary text-2xl">emergency</span>
+            <h1 class="font-headline text-xl font-bold text-secondary tracking-tight">CitizenConnect</h1>
+            <span class="px-2 py-0.5 rounded bg-secondary/10 text-secondary text-[10px] font-bold uppercase">Operator</span>
+        </a>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-secondary/10 text-secondary px-4 py-1.5 rounded-full text-xs font-bold">
+                <span class="material-symbols-outlined text-sm">radio_button_checked</span>
+                UNIT: AMB-042 • ON DUTY
+            </div>
+            <a href="index.html" onclick="sessionStorage.removeItem('operatorAuth')" class="text-outline hover:text-error transition-colors flex items-center gap-1 text-xs font-bold uppercase">
+                <span class="material-symbols-outlined text-sm">logout</span> Logout
+            </a>
+        </div>
+    </div>
+</header>
+
+<main class="flex-1">
+    <div class="max-w-[1440px] mx-auto px-8 py-10">
+        <div class="grid grid-cols-12 gap-8">
+            <!-- Left: Mission Card -->
+            <div class="col-span-12 lg:col-span-7 flex flex-col gap-6">
+                <!-- Active Mission Banner -->
+                <div id="mission-banner" class="bg-status-critical/10 border-2 border-status-critical/30 rounded-2xl p-6 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full bg-status-critical/20 flex items-center justify-center flex-shrink-0 animate-pulse">
+                        <span class="material-symbols-outlined text-status-critical text-3xl">emergency</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-1">
+                            <h2 class="font-headline text-2xl font-bold">Medical Emergency</h2>
+                            <span class="px-2 py-0.5 rounded bg-status-critical text-white text-[10px] font-bold uppercase">Critical</span>
+                        </div>
+                        <p class="text-on-surface-variant text-sm">Ganesh Path, Pune • Submitted 14:32:05</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-outline">Call ID</p>
+                        <p class="font-bold text-primary">#CALL-001</p>
+                    </div>
+                </div>
+
+                <!-- Route Card (Dijkstra) -->
+                <div class="glass-panel rounded-2xl p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-headline text-xl font-bold flex items-center gap-2">
+                            <span class="material-symbols-outlined text-tertiary">route</span>
+                            Optimized Route (Dijkstra)
+                        </h3>
+                        <span class="text-xs text-outline">Total Distance: <span id="route-distance" class="text-primary font-bold">2.4 km</span></span>
+                    </div>
+
+                    <!-- Route Steps -->
+                    <div id="route-steps" class="space-y-0">
+                        <div class="flex items-start gap-4 p-4 bg-surface-container rounded-xl mb-0">
+                            <div class="flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-on-secondary text-sm">my_location</span>
+                                </div>
+                                <div class="w-0.5 h-8 bg-outline-variant mt-2"></div>
+                            </div>
+                            <div class="pt-2">
+                                <p class="font-bold text-sm uppercase tracking-wider text-secondary">Current Position</p>
+                                <p class="text-on-surface font-bold text-lg">Kothrud Depot</p>
+                                <p class="text-xs text-outline">Node 213 • Base Station</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 p-4 ml-5">
+                            <div class="flex flex-col items-center">
+                                <div class="w-6 h-6 rounded-full bg-outline-variant flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-on-surface text-xs">straight</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm">Karve Road</p>
+                                <p class="text-xs text-outline">800m • STRAIGHT</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 p-4 ml-5">
+                            <div class="flex flex-col items-center">
+                                <div class="w-6 h-6 rounded-full bg-outline-variant flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-on-surface text-xs">turn_left</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm">FC Road</p>
+                                <p class="text-xs text-outline">1.2km • LEFT EXIT</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 p-4 ml-5">
+                            <div class="flex flex-col items-center">
+                                <div class="w-6 h-6 rounded-full bg-outline-variant flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-on-surface text-xs">straight</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm">Ganesh Path</p>
+                                <p class="text-xs text-outline">400m • STRAIGHT</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 p-4 bg-status-critical/5 border border-status-critical/20 rounded-xl">
+                            <div class="flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full bg-status-critical flex items-center justify-center flex-shrink-0 animate-pulse">
+                                    <span class="material-symbols-outlined text-white text-sm">location_on</span>
+                                </div>
+                            </div>
+                            <div class="pt-2">
+                                <p class="font-bold text-sm uppercase tracking-wider text-status-critical">Destination</p>
+                                <p class="text-on-surface font-bold text-lg">Emergency Location</p>
+                                <p class="text-xs text-outline">Ganesh Path • Node 1024</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Complete Button -->
+                <button id="complete-btn" onclick="completeJob()" class="w-full bg-operator-success text-white py-5 rounded-2xl font-bold text-xl flex items-center justify-center gap-3 hover:brightness-110 active:scale-[0.98] transition-all shadow-lg shadow-operator-success/30 pulse-border border-2">
+                    <span class="material-symbols-outlined text-3xl">check_circle</span>
+                    Mark Job Complete
+                </button>
+            </div>
+
+            <!-- Right: Info Panels -->
+            <div class="col-span-12 lg:col-span-5 flex flex-col gap-6">
+                <!-- Vehicle Status -->
+                <div id="vehicle-info" class="glass-panel rounded-2xl p-6">
+                    <h3 class="font-headline text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-secondary">ambulance</span>
+                        Your Vehicle
+                    </h3>
+                    <div class="bg-surface-container rounded-xl p-4 flex items-center gap-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-secondary/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-secondary text-2xl">medical_services</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold text-lg">Ambulance_57</p>
+                            <p class="text-xs text-outline">ALS Advanced Unit • ID: 57</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-surface-container rounded-lg p-3 text-center">
+                            <span class="text-[10px] text-outline block uppercase">Status</span>
+                            <span class="text-xs font-bold text-status-critical">BUSY</span>
+                        </div>
+                        <div class="bg-surface-container rounded-lg p-3 text-center">
+                            <span class="text-[10px] text-outline block uppercase">ETA</span>
+                            <span class="text-xs font-bold text-secondary">4 min</span>
+                        </div>
+                        <div class="bg-surface-container rounded-lg p-3 text-center">
+                            <span class="text-[10px] text-outline block uppercase">Speed</span>
+                            <span class="text-xs font-bold text-primary">45 km/h</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nearest Facility -->
+                <div id="facility-info" class="glass-panel rounded-2xl p-6">
+                    <h3 class="font-headline text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">local_hospital</span>
+                        Route to Nearest Facility
+                    </h3>
+                    <div class="bg-surface-container rounded-xl p-4 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-xl">local_hospital</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold">Galaxy Care Hospital</p>
+                            <p class="text-xs text-outline">1.8 km from emergency • 250 beds</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AVL Tree Status -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="font-headline text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-tertiary">account_tree</span>
+                        AVL Tree — Vehicle Database
+                    </h3>
+                    <div class="bg-surface-container rounded-xl p-4 text-center">
+                        <p class="text-xs text-outline mb-2">Syncing to AVL Tree Database...</p>
+                        <div class="w-full bg-surface-container-highest h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-gradient-to-r from-tertiary to-secondary h-full rounded-full w-[80%]" style="animation: shimmer 2s infinite"></div>
+                        </div>
+                        <p class="text-[10px] text-outline mt-2">Vehicle status will update to AVAILABLE after job completion</p>
+                    </div>
+                </div>
+
+                <!-- Recent Dispatches -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="font-headline text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-outline">history</span>
+                        Recent Dispatches
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-surface-container rounded-xl">
+                            <div>
+                                <p class="font-bold text-sm">Fire Hazard — Aundh</p>
+                                <p class="text-[10px] text-outline">Today, 12:45 PM</p>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-status-normal/10 text-status-normal text-[10px] font-bold uppercase">Completed</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-surface-container rounded-xl">
+                            <div>
+                                <p class="font-bold text-sm">Accident — Baner Rd</p>
+                                <p class="text-[10px] text-outline">Today, 10:20 AM</p>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-status-normal/10 text-status-normal text-[10px] font-bold uppercase">Completed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Job Complete Modal -->
+<div id="complete-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center">
+    <div class="glass-panel rounded-3xl p-10 max-w-md w-full text-center flex flex-col items-center gap-6 mx-4">
+        <div class="w-20 h-20 rounded-full bg-operator-success/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-operator-success text-5xl">task_alt</span>
+        </div>
+        <h3 class="font-headline text-2xl font-bold">Job Completed!</h3>
+        <p class="text-on-surface-variant text-sm">Vehicle status updated to <span class="font-bold text-operator-success">AVAILABLE</span> in AVL Tree database.</p>
+        <div id="resolve-info" class="bg-surface-container rounded-xl p-4 w-full text-left text-xs space-y-1">
+            <p class="text-outline">• AVL Tree: Vehicle 57 → STATUS_AVAILABLE</p>
+            <p class="text-outline">• QuadTree: Position updated to current location</p>
+            <p class="text-outline">• Priority Queue: Ready for next dispatch</p>
+        </div>
+        <button onclick="document.getElementById('complete-modal').classList.add('hidden')" class="w-full bg-operator-success text-white py-3 rounded-xl font-bold text-sm hover:brightness-110 transition-all">
+            Await Next Mission
+        </button>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="border-t border-outline-variant/30 bg-surface-container-lowest/50">
+    <div class="max-w-[1440px] mx-auto px-8 py-6 flex justify-between items-center">
+        <span class="text-outline text-xs">© 2026 Emergency Response System</span>
+        
+    </div>
+</footer>
+
+<script>
+// ─── Operator Console: Live API Integration ─────────────────────────
+let activeDispatch = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (!sessionStorage.getItem('operatorAuth')) {
+        window.location.href = 'operator_login.html';
+        return;
+    }
+    checkMission();
+    setInterval(checkMission, 2000); // Poll every 2 seconds
+});
+
+async function checkMission() {
+    try {
+        const res = await fetch('/api/active_mission');
+        const data = await res.json();
+        
+        if (data.has_mission) {
+            if (!activeDispatch || activeDispatch.callID !== data.mission.callID) {
+                activeDispatch = data.mission;
+                renderMission(data.mission);
+            }
+        } else if (!data.has_mission && !activeDispatch) {
+            showWaiting();
+        } else if (!data.has_mission && activeDispatch) {
+            // Admin or another terminal cleared the mission, so we reset
+            activeDispatch = null;
+            showWaiting();
+        }
+    } catch (e) {
+        console.log('[Console] API unavailable');
+    }
+}
+
+function showWaiting() {
+    document.getElementById('mission-banner').innerHTML = `
+        <div class="w-14 h-14 rounded-full bg-status-normal/20 flex items-center justify-center flex-shrink-0 animate-pulse">
+            <span class="material-symbols-outlined text-status-normal text-3xl">radar</span>
+        </div>
+        <div class="flex-1">
+            <h2 class="font-headline text-2xl font-bold">Awaiting Dispatch</h2>
+            <p class="text-on-surface-variant text-sm">Standby. Command will assign an emergency to your unit.</p>
+        </div>`;
+    document.getElementById('mission-banner').className = 'bg-status-normal/10 border-2 border-status-normal/30 rounded-2xl p-6 flex items-center gap-4';
+    
+    // Hide complete button if visible
+    document.getElementById('complete-btn').style.display = 'none';
+    
+    // Clear route details
+    document.getElementById('route-steps').innerHTML = '<div class="text-center text-outline py-4 text-sm">No active route</div>';
+    document.getElementById('route-distance').textContent = '-- km';
+    
+    // Clear static vehicle/facility info
+    document.getElementById('vehicle-info').innerHTML = '<div class="text-center text-outline py-4 text-sm">Awaiting assignment</div>';
+    document.getElementById('facility-info').innerHTML = '<div class="text-center text-outline py-4 text-sm">Awaiting assignment</div>';
+}
+
+function renderMission(d) {
+    const ETYPE_ICONS = { Medical: 'medical_services', Crime: 'local_police', Fire: 'local_fire_department' };
+    const icon = ETYPE_ICONS[d.emergencyType] || 'emergency';
+
+    // Update mission banner
+    document.getElementById('mission-banner').innerHTML = `
+        <div class="w-14 h-14 rounded-full bg-status-critical/20 flex items-center justify-center flex-shrink-0 animate-pulse">
+            <span class="material-symbols-outlined text-status-critical text-3xl">${icon}</span>
+        </div>
+        <div class="flex-1">
+            <div class="flex items-center gap-3 mb-1">
+                <h2 class="font-headline text-2xl font-bold">${d.emergencyType} Emergency</h2>
+                <span class="px-2 py-0.5 rounded bg-status-critical text-white text-[10px] font-bold uppercase">Active</span>
+            </div>
+            <p class="text-on-surface-variant text-sm">${d.locationName.replace(/_/g,' ')} • Call #${d.callID}</p>
+        </div>`;
+    document.getElementById('mission-banner').className = 'bg-status-critical/10 border-2 border-status-critical/30 rounded-2xl p-6 flex items-center gap-4';
+
+    // Update route visualization
+    const route = d.vehicle.route || [];
+    let routeHTML = '';
+    if (route.length > 0) {
+        // Start point
+        routeHTML += `
+        <div class="flex items-start gap-4 p-4 bg-surface-container rounded-xl">
+            <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-on-secondary text-sm">my_location</span>
+                </div>
+                <div class="w-0.5 h-8 bg-outline-variant mt-2"></div>
+            </div>
+            <div class="pt-2">
+                <p class="font-bold text-sm uppercase tracking-wider text-secondary">Vehicle Location</p>
+                <p class="text-on-surface font-bold text-lg">${route[0].name.replace(/_/g,' ')}</p>
+                <p class="text-xs text-outline">Node ${route[0].nodeID}</p>
+            </div>
+        </div>`;
+
+        // Intermediate waypoints (show up to 5)
+        const waypoints = route.slice(1, route.length - 1);
+        const shown = waypoints.slice(0, 5);
+        shown.forEach(step => {
+            routeHTML += `
+            <div class="flex items-start gap-4 p-4 ml-5">
+                <div class="flex flex-col items-center">
+                    <div class="w-6 h-6 rounded-full bg-outline-variant flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-on-surface text-xs">straight</span>
+                    </div>
+                </div>
+                <div>
+                    <p class="font-bold text-sm">${step.name.replace(/_/g,' ')}</p>
+                    <p class="text-xs text-outline">Node ${step.nodeID}</p>
+                </div>
+            </div>`;
+        });
+        if (waypoints.length > 5) {
+            routeHTML += `<div class="text-center text-xs text-outline py-2">... ${waypoints.length - 5} more waypoints ...</div>`;
+        }
+
+        // End point
+        const last = route[route.length - 1];
+        routeHTML += `
+        <div class="flex items-start gap-4 p-4 bg-status-critical/5 border border-status-critical/20 rounded-xl">
+            <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-status-critical flex items-center justify-center flex-shrink-0 animate-pulse">
+                    <span class="material-symbols-outlined text-white text-sm">location_on</span>
+                </div>
+            </div>
+            <div class="pt-2">
+                <p class="font-bold text-sm uppercase tracking-wider text-status-critical">Emergency Location</p>
+                <p class="text-on-surface font-bold text-lg">${last.name.replace(/_/g,' ')}</p>
+                <p class="text-xs text-outline">Node ${last.nodeID}</p>
+            </div>
+        </div>`;
+    }
+
+    document.getElementById('route-steps').innerHTML = routeHTML;
+    document.getElementById('route-distance').textContent = d.vehicle.routeDistance + ' km';
+
+    // Update vehicle info
+    document.getElementById('vehicle-info').innerHTML = `
+        <div class="bg-surface-container rounded-xl p-4 flex items-center gap-4 mb-4">
+            <div class="w-14 h-14 rounded-xl bg-secondary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-secondary text-2xl">${icon}</span>
+            </div>
+            <div class="flex-1">
+                <p class="font-bold text-lg">${d.vehicle.name.replace(/_/g,' ')}</p>
+                <p class="text-xs text-outline">${d.vehicle.type} • ID: ${d.vehicle.id}</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+            <div class="bg-surface-container rounded-lg p-3 text-center">
+                <span class="text-[10px] text-outline block uppercase">Status</span>
+                <span class="text-xs font-bold text-status-critical">BUSY</span>
+            </div>
+            <div class="bg-surface-container rounded-lg p-3 text-center">
+                <span class="text-[10px] text-outline block uppercase">Distance</span>
+                <span class="text-xs font-bold text-secondary">${d.vehicle.routeDistance} km</span>
+            </div>
+            <div class="bg-surface-container rounded-lg p-3 text-center">
+                <span class="text-[10px] text-outline block uppercase">Route Hops</span>
+                <span class="text-xs font-bold text-primary">${d.vehicle.route.length}</span>
+            </div>
+        </div>`;
+
+    // Update facility info
+    if (d.facility) {
+        document.getElementById('facility-info').innerHTML = `
+            <div class="bg-surface-container rounded-xl p-4 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary text-xl">local_hospital</span>
+                </div>
+                <div class="flex-1">
+                    <p class="font-bold">${d.facility.name.replace(/_/g,' ')}</p>
+                    <p class="text-xs text-outline">${d.facility.routeDistance} km from emergency • Capacity: ${d.facility.capacity}</p>
+                </div>
+            </div>`;
+    }
+
+    // Show the complete button
+    document.getElementById('complete-btn').style.display = 'flex';
+}
+
+async function completeJob() {
+    if (!activeDispatch) {
+        document.getElementById('complete-modal').classList.remove('hidden');
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/resolve/${activeDispatch.vehicle.id}`, { method: 'POST' });
+        const data = await res.json();
+
+        // Update modal with real data
+        document.getElementById('resolve-info').innerHTML = `
+            <p class="text-outline">• AVL Tree: Vehicle ${activeDispatch.vehicle.id} → STATUS_AVAILABLE</p>
+            <p class="text-outline">• Vehicle: ${activeDispatch.vehicle.name.replace(/_/g,' ')}</p>
+            <p class="text-outline">• Priority Queue: Ready for next dispatch</p>`;
+
+        document.getElementById('complete-modal').classList.remove('hidden');
+        activeDispatch = null;
+        document.getElementById('complete-btn').style.display = 'none';
+
+        // Reset to check mission state
+        setTimeout(checkMission, 1000);
+    } catch (e) {
+        alert('Error: ' + e.message);
+    }
+}
+</script>
+
+</body>
+</html>
